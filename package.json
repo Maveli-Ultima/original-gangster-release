@@ -24,6 +24,7 @@
     "package": "npm run build:release && node scripts/package-desktop.mjs",
     "package:win": "npm run build:release && node scripts/package-desktop.mjs --win",
     "package:linux": "npm run build:release && node scripts/package-desktop.mjs --linux tar.gz",
+    "package:mac": "npm run build:release && node scripts/package-desktop.mjs --mac --x64 --arm64",
     "desktop:smoke": "npm run build:release && node scripts/desktop-smoke.mjs",
     "build:release": "npm run build && node scripts/optimize-art.mjs dist/art"
   },

@@ -38,6 +38,11 @@ Then open the URL Vite prints (port 5180 by default).
 | `npm run package` | Build desktop installers for the current platform |
 | `npm run package:win` | Build the Windows installer and portable exe |
 | `npm run package:linux` | Build a Linux `.tar.gz` |
+| `npm run package:mac` | Build macOS `.dmg` files for Apple Silicon and Intel (macOS only) |
+
+macOS builds can only be made on a Mac. Without one, run the **Mac build**
+workflow from the repository's Actions tab: it builds both `.dmg` files on
+GitHub's macOS runners and can attach them to a release.
 
 Packaged builds go to `release/`. A checkout inside OneDrive packages to
 `%LOCALAPPDATA%\OriginalGangster-release` instead, because OneDrive locks the

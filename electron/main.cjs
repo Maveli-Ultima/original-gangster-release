@@ -108,7 +108,12 @@ else {
     if (win) { if (win.isMinimized()) win.restore(); win.show(); win.focus(); }
   });
   app.whenReady().then(() => {
-    if (app.isPackaged) Menu.setApplicationMenu(null);
+    // The packaged game has no menu, except on macOS, which takes Cmd+Q and
+    // the text-field shortcuts from the menu bar: it keeps the app and edit menus.
+    if (app.isPackaged) {
+      Menu.setApplicationMenu(process.platform === 'darwin'
+        ? Menu.buildFromTemplate([{ role: 'appMenu' }, { role: 'editMenu' }]) : null);
+    }
     // The game asks for nothing (camera, microphone, notifications...).
     session.defaultSession.setPermissionRequestHandler((_wc, _permission, callback) => callback(false));
     if (!DEV_URL) serveDist();
