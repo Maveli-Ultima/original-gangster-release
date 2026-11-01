@@ -1,0 +1,107 @@
+{
+  "note": "Immutable pre-floor-correction geometry SHA256 of JSON numeric arrays; source architecture SHA475b0aca6e7f5571025785b74a47192a20bae7bd650a2537380a8b72f5cf5e8b; Three0.169.0. Generated from preserved source.",
+  "interior": [
+    {
+      "industrial": false,
+      "slab": {
+        "position": "806320d4cce238fb0efe10572ff06bf96fd15e3e98e39d31a83f16a3d5203694",
+        "normal": "901ca542e8382b9da48a923c02d979d5123e7ab43afc5eaf63a4431460b2817f"
+      },
+      "partitions": {
+        "position": "c3b24096cbd3679054903c0b06f86917b4677e40f60e3cf29a6bd01c8b9ab54f",
+        "normal": "058bcee8ce2a0c0294d149ed606844da261e68e641f2f6c82b98b32e7b5c3b21"
+      },
+      "bounds": {
+        "min": [
+          -0.4975000023841858,
+          0.014999999664723873,
+          -0.4975000023841858
+        ],
+        "max": [
+          0.4975000023841858,
+          1.274999976158142,
+          0.4975000023841858
+        ]
+      },
+      "triangles": 200
+    },
+    {
+      "industrial": true,
+      "slab": {
+        "position": "806320d4cce238fb0efe10572ff06bf96fd15e3e98e39d31a83f16a3d5203694",
+        "normal": "901ca542e8382b9da48a923c02d979d5123e7ab43afc5eaf63a4431460b2817f"
+      },
+      "partitions": {
+        "position": "76cdc52374746d41d12e0fd3c98867bb786e915afcf878add8dea618fc26f605",
+        "normal": "15cfe1cf75b789c0b8097259f1ed2acbcc0e78ef22817462c544ef6253a372c2"
+      },
+      "bounds": {
+        "min": [
+          -0.4975000023841858,
+          0.014999999664723873,
+          -0.4975000023841858
+        ],
+        "max": [
+          0.4975000023841858,
+          1.274999976158142,
+          0.4975000023841858
+        ]
+      },
+      "triangles": 164
+    }
+  ],
+  "doors": [
+    {
+      "cutaway": false,
+      "attributes": {
+        "position": "2b2e729c75ac1f2f2182dab9586139d6d09c7c36a6386017e0e87feed3312d37",
+        "normal": "b65358e65c5540856dcfce25820f6fa591e67b18adf31b305e0ebe582aeefeaa",
+        "color": "56779685d1e55bd611a6e395dccfe4ecc66d309570dff63fe6cdc1e0b46edb77",
+        "uv": "213dce2fb6f02d2c41f781842a43ef99b8bfb59b1c4a0cf8cb1067b94f94ce7b"
+      },
+      "bounds": {
+        "min": [
+          -0.6499999761581421,
+          8.940696516468449e-10,
+          -0.04000000283122063
+        ],
+        "max": [
+          0.6499999761581421,
+          2.819999933242798,
+          0.16500000655651093
+        ]
+      },
+      "userData": {
+        "leafWidth": 1.1,
+        "leafHeight": 2.7,
+        "cutawayHeight": null
+      }
+    },
+    {
+      "cutaway": true,
+      "attributes": {
+        "position": "4367e56ba4fadf869c1c453b7b20bb1d0821655ad5620ab82e3ea12434363cc7",
+        "normal": "e82257c3ba8ec31ec71be0ae649594cb77ae7baeb37c4af68e67402f24f4cede",
+        "color": "81fbadb3c9d43d50b1be568e0c86fec98ecb590d72068d31b96a1616d1e88ecb",
+        "uv": "9aa3073bc38ce1f83b91ac8704f429e0703cd2b9b638da8ec83c120c673de170"
+      },
+      "bounds": {
+        "min": [
+          -0.6499999761581421,
+          0,
+          -0.04000000283122063
+        ],
+        "max": [
+          0.6499999761581421,
+          1.25,
+          0.16500000655651093
+        ]
+      },
+      "userData": {
+        "leafWidth": 1.1,
+        "leafHeight": 2.7,
+        "cutawayHeight": 1.25
+      }
+    }
+  ]
+}
