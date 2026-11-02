@@ -1,4 +1,5 @@
 import { readTextureQuality, writeTextureQuality, type TextureQuality } from '../render/textureQuality';
+import { applyUiScale, readUiScale, writeUiScale } from './uiScale';
 import { applyLiveMovement } from '../sim/movement';
 import { recordScorePeaks } from '../sim/scoring';
 import { observeTargetRace } from '../sim/targetRace';
@@ -96,6 +97,8 @@ interface GameState {
   mouseReversal: boolean;
   /** Model texture quality; applies when the city next loads (A20). */
   textureQuality: TextureQuality;
+  /** Interface scale chosen in Options (desktop app; see uiScale.ts). */
+  uiScale: number;
   quitPrompt: boolean;
   jobCard: JobCard | null;
   specialistCard: { type: SpecialistJob['type']; personId: ID | null } | null;
@@ -164,6 +167,7 @@ interface GameState {
   setRoadNames: (on: boolean) => void;
   setMouseReversal: (on: boolean) => void;
   setTextureQuality: (quality: TextureQuality) => void;
+  setUiScale: (scale: number) => void;
   togglePoliceAreaBlock: (id: ID) => void;
   clearPoliceArea: () => void;
   setReviewOrder: (id: ID | null) => void;
@@ -276,6 +280,7 @@ export const useGame = create<GameState>((set, get) => ({
   roadNames: readRoadNames(),
   mouseReversal: readMouseReversal(),
   textureQuality: readTextureQuality(),
+  uiScale: readUiScale(),
   quitPrompt: false,
   jobCard: null,
   specialistCard: null,
@@ -546,6 +551,11 @@ export const useGame = create<GameState>((set, get) => ({
   setTextureQuality: (textureQuality) => {
     writeTextureQuality(textureQuality);
     set({ textureQuality });
+  },
+  setUiScale: (uiScale) => {
+    writeUiScale(uiScale);
+    set({ uiScale });
+    applyUiScale(uiScale);
   },
   setMouseReversal: (mouseReversal) => {
     try { localStorage.setItem('og.mouseReversal', mouseReversal ? '1' : '0'); } catch { /* session only */ }

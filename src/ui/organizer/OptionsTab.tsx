@@ -7,6 +7,47 @@ import { audio } from '../../audio/audio';
 import { GO_STRAIGHT_ASSETS } from '../../sim/constants';
 import { gangAssets, gangWealth, money, powerRating, territoryCount } from '../../sim/world';
 import { ConfirmDialog, Empty, Panel } from '../common';
+import { UI_SCALES, uiScaleAvailable, uiScaleInUse } from '../../app/uiScale';
+
+/** Interface size: zooms the whole desktop window; a browser has its own zoom. */
+function InterfaceSize() {
+  const uiScale = useGame((s) => s.uiScale);
+  const setUiScale = useGame((s) => s.setUiScale);
+  const [inUse, setInUse] = useState(uiScaleInUse);
+  useEffect(() => {
+    const update = () => setInUse(uiScaleInUse());
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, [uiScale]);
+  const percent = (scale: number) => `${Math.round(scale * 100)}%`;
+
+  if (!uiScaleAvailable()) {
+    return (
+      <div className="muted tiny" style={{ marginTop: 8 }}>
+        Interface size: use your browser's zoom (Ctrl + and Ctrl −, or ⌘ + and ⌘ − on a Mac).
+      </div>
+    );
+  }
+  return (
+    <>
+      <div className="tiny" style={{ marginTop: 10 }}>Interface size</div>
+      <div className="row" role="group" aria-label="Interface size" style={{ gap: 4, marginTop: 4, flexWrap: 'wrap' }}>
+        {UI_SCALES.map((scale) => (
+          <button key={scale} aria-pressed={uiScale === scale} className={`btn sm${uiScale === scale ? ' on' : ''}`}
+            onClick={() => setUiScale(scale)}>
+            {percent(scale)}
+          </button>
+        ))}
+      </div>
+      <div className="muted tiny" style={{ marginTop: 6 }}>
+        {Math.abs(inUse - uiScale) > 0.001
+          ? `This window has room for ${percent(inUse)}; ${percent(uiScale)} applies when the window is larger.`
+          : 'Scales menus, panels and text, for large or high-resolution screens.'}
+      </div>
+    </>
+  );
+}
 
 export function OptionsTab() {
   const sim = useGame((s) => s.sim)!;
@@ -147,6 +188,7 @@ export function OptionsTab() {
         <div className="muted tiny" style={{ marginTop: 6 }}>
           Standard uses a quarter of the graphics memory for people, cars and trees, for older graphics cards. It applies when the city next loads.
         </div>
+        <InterfaceSize />
       </Panel>
 
       <Panel title="Sound">
