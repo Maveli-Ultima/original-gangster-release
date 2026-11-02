@@ -5,7 +5,7 @@ import { cloneSavedWorld, loadGame, saveGame } from '../src/app/save';
 import { issueOrder, issueStreetOrder } from '../src/sim/api';
 import { respondToBureauViolence } from '../src/sim/bureauViolence';
 import { tickOrders } from '../src/sim/execution';
-import { originalFireOdds } from '../src/sim/fireRoll';
+import { fireRate, originalFireOdds } from '../src/sim/fireRoll';
 import { Sim } from '../src/sim/sim';
 import { tickStreetOrders } from '../src/sim/systems/street';
 import type { PersonRole, WorldState } from '../src/sim/types';
@@ -61,7 +61,7 @@ function hits(sim: Sim) {
  * lethal share of the damage octet, which this refuses (no gunfire HP). */
 function wounds(sim: Sim, s: ReturnType<typeof scene>) {
   const w = sim.world, actor = w.people[s.actor.id], target = w.people[s.target.id];
-  const lethal = originalFireOdds(actor, target, 'tommy', Math.hypot(actor.pos.x - target.pos.x, actor.pos.y - target.pos.y)).killGivenHit;
+  const lethal = originalFireOdds(actor, target, 'tommy', Math.hypot(actor.pos.x - target.pos.x, actor.pos.y - target.pos.y), fireRate('tommy')).killGivenHit;
   vi.spyOn(sim.rng, 'chance').mockImplementation(p => p !== lethal);
   vi.spyOn(sim.rng, 'range').mockReturnValue(1);
   vi.spyOn(sim.rng, 'int').mockReturnValue(30);

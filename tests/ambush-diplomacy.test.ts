@@ -84,6 +84,18 @@ describe('diplomacy governs ordinary encounters; Ambush is a deliberate attack i
       expect(s.rival.offered[s.gang.id]).toBe('war');
     });
 
+  it('an ambusher with a Tommy gets three shots into each attempt', () => {
+    const s = fixture();
+    s.team.weapons = { pistol: 0, shotgun: 0, rifle: 0, tommy: 1, twinPistols: 0, explosives: 0 };
+    s.target.pos.x = s.actor.pos.x + 2;
+    ambush(s);
+    const chance = vi.spyOn(s.sim.rng, 'chance').mockReturnValue(false);
+    tickCombat(s.w, s.sim.rng, 1, []);
+    const { hit } = originalFireOdds(s.actor, s.target, 'tommy', 2);
+    expect(chance.mock.calls[0][0]).toBeCloseTo(1 - (1 - hit) ** 3, 10);
+    expect(s.w.crimes.filter(c => c.perpetratorId === s.actor.id && c.kind === 'shootout')).toHaveLength(1);
+  });
+
   it.each(['waiting', 'travelling', 'outside area', 'indoors', 'own gang'] as const)(
     'does not initiate an ambush against an invalid opportunity: %s', condition => {
       const s = fixture(), order = ambush(s, true);

@@ -45,6 +45,13 @@ const DAMAGE: Record<string, readonly number[]> = {
 const HIT_ROW: Record<Firearm, string> = { pistol: 'pistol', twinPistols: 'twinPistols', tommy: 'tommy', rifle: 'rifle', shotgun: 'shotgun' };
 const DAMAGE_ROW: Record<Firearm, string> = { pistol: 'pistol', twinPistols: 'pistol', tommy: 'tommy', rifle: 'rifle', shotgun: 'shotgun' };
 
+/**
+ * The original rolls once per firing animation; Hit Table.xtx calls its numbers
+ * "per action". The Tommy's animation is about a third as long as a rifle's
+ * (2 frames against 8, plus a tick to re-aim), which pays for its low hit row.
+ */
+export const fireRate = (weapon: Firearm | undefined) => weapon === 'tommy' ? 3 : 1;
+
 /** One original cell: a fifth of a block's street-to-street pitch. */
 export const ORIGINAL_CELL_METRES = CELL / 5;
 
@@ -56,9 +63,10 @@ const DODGERS = new Set<Person['role']>(['boss', 'lieutenant', 'hood', 'owner', 
  * The roll's exact odds: the probability of a hit, averaged over the 40 morale
  * draws (and a civilian's 1..4 defence), and the share of the damage octet at
  * this range that is lethal. Drawing `hit` then `kills | hit` from these gives
- * the original's distribution with one RNG call per stage.
+ * the original's distribution with one RNG call per stage. `shots` fired
+ * within one attempt combine into a single pair of odds.
  */
-export function originalFireOdds(attacker: Person, defender: Person, weapon: Firearm, metres: number):
+export function originalFireOdds(attacker: Person, defender: Person, weapon: Firearm, metres: number, shots = 1):
   { hit: number; killGivenHit: number } {
   const range = Math.floor(metres / ORIGINAL_CELL_METRES);
   const base = HIT[HIT_ROW[weapon]][range] ?? 0;
@@ -71,12 +79,16 @@ export function originalFireOdds(attacker: Person, defender: Person, weapon: Fir
     hit += Math.max(0, Math.min(100, chance - 1)) / 100;   // rand % 100 + 1 < chance
   }
   const octet = DAMAGE[DAMAGE_ROW[weapon]].slice(8 * range, 8 * range + 8);
-  return { hit: hit / (40 * defs.length), killGivenHit: octet.filter(v => v >= 3).length / 8 };
+  const single = { hit: hit / (40 * defs.length), killGivenHit: octet.filter(v => v >= 3).length / 8 };
+  if (shots === 1) return single;
+  const anyHit = 1 - (1 - single.hit) ** shots;
+  const anyKill = 1 - (1 - single.hit * single.killGivenHit) ** shots;
+  return { hit: anyHit, killGivenHit: anyHit > 0 ? anyKill / anyHit : 0 };
 }
 
-export function originalFireRoll(rng: Rng, attacker: Person, defender: Person, weapon: Firearm, metres: number):
+export function originalFireRoll(rng: Rng, attacker: Person, defender: Person, weapon: Firearm, metres: number, shots = 1):
   { hit: boolean; kills: boolean } {
-  const odds = originalFireOdds(attacker, defender, weapon, metres);
+  const odds = originalFireOdds(attacker, defender, weapon, metres, shots);
   const hit = rng.chance(odds.hit);
   return { hit, kills: hit && rng.chance(odds.killGivenHit) };
 }
