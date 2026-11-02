@@ -24,7 +24,7 @@ export function loadSamples(loaded?: (name: SampleName) => void): Promise<void> 
   loading = (async () => {
     for (const name of ALL) {
       try {
-        const res = await fetch(`/audio/${name}.mp3`);
+        const res = await fetch(`${import.meta.env.BASE_URL}audio/${name}.mp3`);
         if (!res.ok) continue;
         buffers.set(name, await bus.ctx.decodeAudioData(await res.arrayBuffer()));
         loaded?.(name);

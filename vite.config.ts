@@ -6,6 +6,9 @@ import { readFileSync } from 'node:fs';
 const version = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8')).version as string;
 
 export default defineConfig({
+  // Where the game is served from: "/" for the desktop app and local runs, the
+  // repository's subfolder for GitHub Pages (set by the Pages workflow).
+  base: process.env.OG_BASE ?? '/',
   plugins: [react()],
   define: { __APP_VERSION__: JSON.stringify(version) },
   server: { port: 5180, strictPort: false },

@@ -9,7 +9,7 @@ export interface CombatMotions {fps:number;clips:Record<CombatMotionName,BakedMo
 let pending:Promise<CombatMotions>|undefined;
 export function loadCombatMotions():Promise<CombatMotions>{
   // Daily clips (running, gestures) share the combat clips' format and styles.
-  return pending??(pending=Promise.all(['combat','burning','daily','close'].map(name=>fetch(`/art/city/sculpt/${name}-motions.json`).then(response=>{
+  return pending??(pending=Promise.all(['combat','burning','daily','close'].map(name=>fetch(`${import.meta.env.BASE_URL}art/city/sculpt/${name}-motions.json`).then(response=>{
     if(!response.ok)throw new Error(`Combat animation load failed (${response.status})`);
     return response.json() as Promise<CombatMotions>;
   }))).then(([combat,burning,daily,close])=>({fps:combat.fps,clips:{...combat.clips,...burning.clips,...daily.clips,...close.clips}})).catch(error=>{pending=undefined;throw error;}));

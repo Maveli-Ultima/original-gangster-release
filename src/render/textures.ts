@@ -790,7 +790,7 @@ export interface CityArt {
   road: HTMLImageElement | null;
 }
 
-const ART_CITY = '/art/city/';
+const ART_CITY = `${import.meta.env.BASE_URL}art/city/`;
 
 /** Palette name → delivered facade file stem. */
 const FACADE_FILES: Record<string, string> = {

@@ -7,7 +7,7 @@ import thickenedIcons from '../../public/art/icons-small/index.json';
  * fall back from and the manifest in public/art stays the single inventory.
  */
 
-export const ART_ROOT = '/art';
+export const ART_ROOT = `${import.meta.env.BASE_URL}art`;
 
 export function art(path: string): string {
   return `${ART_ROOT}/${path}`;

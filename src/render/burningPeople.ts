@@ -18,7 +18,7 @@ export class BurningPeople {
   constructor(private scene:THREE.Scene){
     this.smoke=new BodySmoke(scene,MAX_BURNING_ACTORS);
     this.texture=typeof document==='undefined'?new THREE.Texture():new THREE.TextureLoader().load(
-      '/art/effects/three-fire.png',texture=>{if(this.disposed)texture.dispose();});
+      `${import.meta.env.BASE_URL}art/effects/three-fire.png`,texture=>{if(this.disposed)texture.dispose();});
     this.texture.generateMipmaps=false;
     this.texture.minFilter=this.texture.magFilter=THREE.LinearFilter;
   }

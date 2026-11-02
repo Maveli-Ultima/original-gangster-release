@@ -56,7 +56,7 @@ export class SculptTrees {
 
   async load(): Promise<void> {
     const loader = new GLTFLoader();
-    const results = await Promise.allSettled(TREE_KINDS.map(kind => loader.loadAsync(`/art/city/sculpt/trees/${kind}.glb`)));
+    const results = await Promise.allSettled(TREE_KINDS.map(kind => loader.loadAsync(`${import.meta.env.BASE_URL}art/city/sculpt/trees/${kind}.glb`)));
     // Own fulfilled siblings even after cancellation or a partial load failure.
     for (const result of results) if (result.status === 'fulfilled') result.value.scene.traverse(child => {
       if (!(child instanceof THREE.Mesh)) return;

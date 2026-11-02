@@ -16,7 +16,7 @@ import { characterSupports, characterFloor, type GroundSupport } from './charact
 import type { VehicleId } from '../sim/types';
 import { createSculptVehicle, SCULPT_VEHICLE_KINDS } from './sculptVehicles';
 
-const BASE = '/art/city/sculpt';
+const BASE = `${import.meta.env.BASE_URL}art/city/sculpt`;
 const STYLES = DETAILED_CHARACTER_STYLES;
 const EQUIPMENT_KINDS = GENERATED_EQUIPMENT_KINDS;
 const ACTOR_HEIGHT = DETAILED_CHARACTER_HEIGHTS;

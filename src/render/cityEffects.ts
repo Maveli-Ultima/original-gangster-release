@@ -43,7 +43,7 @@ export class CityEffects {
     this.week=world.week;this.sequence=presentationEvents(world).sequence;
     this.debris=new ExplosionDebris(scene);
     if(typeof document!=='undefined'){
-      this.fireTexture=new THREE.TextureLoader().load('/art/effects/three-fire.png',texture=>{
+      this.fireTexture=new THREE.TextureLoader().load(`${import.meta.env.BASE_URL}art/effects/three-fire.png`,texture=>{
         if(this.disposed){texture.dispose();return;}this.textureReady=true;
       });
       this.fireTexture.generateMipmaps=false;this.fireTexture.minFilter=this.fireTexture.magFilter=THREE.LinearFilter;

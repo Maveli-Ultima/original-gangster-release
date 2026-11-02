@@ -42,7 +42,7 @@ export class SculptRubble {
   constructor(){this.group.name='sculpt-building-rubble';}
   async load():Promise<void>{
     const kinds:RubbleKind[]=['brick','stone'],loader=new GLTFLoader();
-    const results=await Promise.allSettled(kinds.map(kind=>loader.loadAsync(`/art/city/sculpt/rubble/${kind}.glb`)));
+    const results=await Promise.allSettled(kinds.map(kind=>loader.loadAsync(`${import.meta.env.BASE_URL}art/city/sculpt/rubble/${kind}.glb`)));
     for(const result of results)if(result.status==='fulfilled')result.value.scene.traverse(o=>{if(o instanceof THREE.Mesh){
       this.geometries.add(o.geometry);for(const m of Array.isArray(o.material)?o.material:[o.material]){this.materials.add(m);
         for(const v of Object.values(m))if(v instanceof THREE.Texture)this.textures.add(v);}}});

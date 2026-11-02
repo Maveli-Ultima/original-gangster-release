@@ -8,6 +8,14 @@ Original Gangster is a fan project. It is not affiliated with or endorsed by
 Hothouse Creations, Eidos Interactive or the rights holders of the original game.
 All art, models, music and sound were made for this project.
 
+## Play
+
+- **In your browser:** https://daleeb.github.io/original-gangster-release/
+- **Desktop (Windows, Linux, macOS):** download from the
+  [Releases](https://github.com/daleeb/original-gangster-release/releases) page.
+
+Browser saves are kept in that browser; the desktop app saves to disk.
+
 ## Requirements
 
 - [Node.js](https://nodejs.org/) 20.19+, 22.12+ or 24+ (`.node-version` pins 24.19.0)
