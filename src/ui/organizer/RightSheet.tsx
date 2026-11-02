@@ -23,6 +23,7 @@ import { ConfirmDialog, Empty, Hint, Icon, Kicker, Rivets, SkillList, Stamp, Sta
 /** Roles that have an engraved glyph of their own. */
 const ROLE_ICON = new Set(['police', 'policeChief', 'fbi', 'fbiHead', 'judge', 'da', 'mayor', 'reporter', 'clergy', 'snitch', 'accountant', 'lawyer', 'citizen']);
 import { Portrait } from '../Portrait';
+import { RECRUIT_TABS, isStaffRole, recruitsOnTab, staffHireLabel, type RecruitTabId } from './recruitTabs';
 import { handleMapHit } from '../mapClick';
 import { selectableOrderPerson, selectableOrderSite, selectedOrderSites } from '../../app/orderSelection';
 import { resourceDragProps, useResourceDrop } from '../resourceDrag';
@@ -381,21 +382,35 @@ function VehiclesSheet({ teamId }: { teamId: ID }) {
   );
 }
 
+/** The sheet unmounts when it closes; this brings the player back to the same tab. */
+let lastRecruitTab: RecruitTabId = 'hood';
+
 function RecruitsSheet({ teamId }: { teamId: ID | null }) {
   const sim = useGame((s) => s.sim)!;
   const notify = useGame((s) => s.notify);
+  const [tab, setTab] = useState(lastRecruitTab);
   const w = sim.world;
   const gang = sim.playerGang;
   const recruits = gang.recruitIds.map((id) => w.people[id]).filter(Boolean);
+  const shown = recruitsOnTab(recruits, tab);
+  const openTab = (id: RecruitTabId, list: HTMLElement | null) => {
+    lastRecruitTab = id;
+    setTab(id);
+    list?.scrollTo({ top: 0 });
+  };
   return (
     <>
-      {recruits.length === 0 ? (
-        <Empty>
-          Nobody is offering their services. Send a hood to Recruit at a gym, pool hall, the docks or the labour
-          exchange.
-        </Empty>
+      <div className="sub-tabs recruit-tabs">
+        {RECRUIT_TABS.map((t) => (
+          <button key={t.id} aria-pressed={tab === t.id} className={tab === t.id ? 'on' : ''} onClick={(e) => openTab(t.id, e.currentTarget.closest('.rs-body'))}>
+            {t.label} · {recruitsOnTab(recruits, t.id).length}
+          </button>
+        ))}
+      </div>
+      {shown.length === 0 ? (
+        <Empty>{RECRUIT_TABS.find((t) => t.id === tab)!.empty}</Empty>
       ) : (
-        recruits.map((p) => (
+        shown.map((p) => (
           <div key={p.id} style={{ padding: '8px 0', borderBottom: '1px dotted var(--dots)' }}>
             <div className="row" style={{ gap: 12, alignItems: 'flex-start' }}>
               <div className="avatar">
@@ -414,24 +429,32 @@ function RecruitsSheet({ teamId }: { teamId: ID | null }) {
               </div>
             </div>
             <div className="row wrap" style={{ gap: 6 }}>
-              {teamId != null && (
-                <button className="btn sm brass" onClick={() => notify(act((s) => hireRecruit(s.world, gang.id, p.id, 'team', teamId))!)}>
-                  Hire to team
+              {isStaffRole(p.role) ? (
+                // A specialist has one post to fill, wherever the button says they are going.
+                <button className="btn sm brass" onClick={() => notify(act((s) => hireRecruit(s.world, gang.id, p.id, 'pool'))!)}>
+                  {staffHireLabel(p.role, w.people[(p.role === 'lawyer' ? gang.lawyerId : gang.accountantId) ?? -1]?.name)}
                 </button>
-              )}
-              <button className="btn sm" onClick={() => notify(act((s) => hireRecruit(s.world, gang.id, p.id, 'pool'))!)}>
-                Hire to pool
-              </button>
-              {p.role === 'hood' && (
-                <button className="btn sm" onClick={() => notify(act((s) => hireRecruit(s.world, gang.id, p.id, 'lieutenant'))!)}>
-                  As lieutenant (+$50)
-                </button>
+              ) : (
+                <>
+                  {teamId != null && (
+                    <button className="btn sm brass" onClick={() => notify(act((s) => hireRecruit(s.world, gang.id, p.id, 'team', teamId))!)}>
+                      Hire to team
+                    </button>
+                  )}
+                  <button className="btn sm" onClick={() => notify(act((s) => hireRecruit(s.world, gang.id, p.id, 'pool'))!)}>
+                    Hire to pool
+                  </button>
+                  {p.role === 'hood' && (
+                    <button className="btn sm" onClick={() => notify(act((s) => hireRecruit(s.world, gang.id, p.id, 'lieutenant'))!)}>
+                      As lieutenant (+$50)
+                    </button>
+                  )}
+                </>
               )}
             </div>
           </div>
         ))
       )}
-      {gang.recruitIds.length > 0 && <div className="muted" style={{ marginTop: 6 }}>Hiring an accountant or lawyer replaces the one you already have.</div>}
       <div className="muted" style={{ marginTop: 8 }}>
         Managers currently running your businesses:{' '}
         {Object.values(w.buildings)

@@ -1447,6 +1447,17 @@ input[type='range']::-moz-range-thumb {
   color: var(--ink);
 }
 
+/* Recruit cards are tall: keep the filter in reach while the list scrolls. */
+.recruit-tabs {
+  position: sticky;
+  top: -14px;
+  z-index: 1;
+  margin: -14px -18px 6px;
+  padding: 8px 18px 6px;
+  background: var(--paper);
+  border-bottom: 1px dotted var(--dots);
+}
+
 .hood-cards {
   display: flex;
   gap: 10px;
