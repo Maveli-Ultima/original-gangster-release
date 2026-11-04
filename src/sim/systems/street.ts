@@ -2,7 +2,7 @@ import { addMessage, recordCrime } from '../events';
 import { respondToBureauViolence } from '../bureauViolence';
 import { keepContactDistance, killPerson, knockDown } from '../execution';
 import { dist } from '../world';
-import { originalFireRoll } from '../fireRoll';
+import { fireRate, originalFireRoll } from '../fireRoll';
 import { presentAttack } from '../presentationEvents';
 import { absoluteMinute, UNDER_FIRE_MINUTES } from './combat';
 import { clearDestination, setDestination, stepPerson } from '../movement';
@@ -92,8 +92,9 @@ export function tickStreetOrders(w: WorldState, rng: Rng, minutes: number, loado
     if (so.type === 'kill') {
       // One attempt per simulation tick (6.7 real seconds at Normal). Skill
       // controls accuracy, not minutes of random inactivity before firing.
-      // Guns use the original fire roll (fireRoll.ts); melee keeps the remake model.
-      const shot = weapon ? originalFireRoll(rng, p, target, weapon, dist(p.pos, target.pos)) : null;
+      // Guns use the original fire roll (fireRoll.ts), scaled by rate of fire;
+      // melee keeps the remake model.
+      const shot = weapon ? originalFireRoll(rng, p, target, weapon, dist(p.pos, target.pos), fireRate(weapon)) : null;
       if (!weapon) keepContactDistance([p], target);
       const hit = shot ? shot.hit : rng.chance(Math.min(0.9, spec.accuracy * (0.45 + skill * 0.14) * (1 - (target.skills.stealth - 0.5) * 0.07)));
       presentAttack(w, p, target, weapon, hit);

@@ -8,7 +8,7 @@ import { completeAmbush, killPerson } from '../execution';
 import { dismount, stepOut } from '../transport';
 import { onRoad, pavementBeside } from '../vehicleNavigation';
 import { MINUTES_PER_WEEK } from '../constants';
-import { originalFireRoll } from '../fireRoll';
+import { fireRate, originalFireRoll } from '../fireRoll';
 import { presentAttack } from '../presentationEvents';
 import type { Rng } from '../rng';
 import type { ID, Person, WorldState } from '../types';
@@ -140,12 +140,12 @@ export function peaceFireOpportunity(
 }
 
 /** Both deliberate combat and accidental fire use the same allocated weapon. */
-function exchange(w: WorldState, rng: Rng, a: Person, b: Person, loadout: Loadout): void {
+function exchange(w: WorldState, rng: Rng, a: Person, b: Person, loadout: Loadout, shots = 1): void {
   const { weapon, spec, skill } = attackProfile(loadout, a);
   // Gunfire follows the original roll (fireRoll.ts): no hit points, a wound
   // class of 3 or 4 kills and anything less only staggers. Close combat keeps
   // the remake model until the original's move tables (0x465330) are traced.
-  const shot = weapon ? originalFireRoll(rng, a, b, weapon, Math.sqrt(dist2(a.pos, b.pos))) : null;
+  const shot = weapon ? originalFireRoll(rng, a, b, weapon, Math.sqrt(dist2(a.pos, b.pos)), shots) : null;
   const hit = shot ? shot.hit : rng.chance(Math.min(
     0.9,
     spec.accuracy * (0.45 + skill * 0.14) * (1 - (b.skills.stealth - 0.5) * 0.07),
@@ -220,7 +220,8 @@ export function tickCombat(
         // stance is his to set.
         // (An ambush is an attempt on their lives: it counts as a killing.)
         provoke(w, target.gangId, order.gangId, INCIDENT_HOSTILITY.kill);
-        exchange(w, rng, a, target, loadout);
+        // An ambusher fires every tick, so the rate of fire scales each attempt.
+        exchange(w, rng, a, target, loadout, fireRate(attackProfile(loadout, a).weapon));
       }
       continue;
     }
@@ -260,13 +261,13 @@ export function tickCombat(
 
       // ---- gang on gang
       if (!gangHostile(w, a, b, territory)) continue;
-      const { spec } = attackProfile(loadout, a);
+      const { spec, weapon } = attackProfile(loadout, a);
       const range = spec.range;
       if (dist2(a.pos, b.pos) > range * range) continue;
       inBattle = true;
 
       // Rate of fire: a chance per minute so short passes rarely end in death.
-      if (!rng.chance(0.09 * minutes)) continue;
+      if (!rng.chance(0.09 * fireRate(weapon) * minutes)) continue;
 
       exchange(w, rng, a, b, loadout);
       break; // one exchange per actor per tick
