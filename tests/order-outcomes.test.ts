@@ -216,6 +216,21 @@ describe('planned orders produce real gameplay outcomes', () => {
     expect(dist(old.pos, buildingDoor(s.w, home))).toBeLessThan(1);
   });
 
+  it.each(['the crew has no hood', 'the lieutenant is named'])('keeps the manager and reports failure when no hood goes because %s', (reason) => {
+    const s = fixture(), site = allBuildings(s.w).find(b => b.ownerGangId === s.gang.id && b.managerId != null)!;
+    const manager = site.managerId!;
+    if (reason === 'the crew has no hood') {
+      for (const id of s.team.memberIds.splice(0)) { s.w.people[id].teamId = null; s.gang.poolIds.push(id); }
+    }
+    const preferredHoodId = reason === 'the lieutenant is named' ? s.team.lieutenantId : null;
+    const order = run(s, { type: 'runBusiness', buildingIds: [site.id], opts: { preferredHoodId } }, true);
+    expect(order.state).toBe('failed');
+    expect(order.failReason).toMatch(/No hood was free to run/);
+    expect(order.results.join(' ')).not.toMatch(/New management/);
+    expect(site.managerId).toBe(manager);
+    expect(s.w.people[manager].buildingId).toBe(site.id);
+  });
+
   it('kidnaps a rival, allows interrogation and releases them onto the street', () => {
     // A kidnapping is a real roll a strong crew can still lose; take the first
     // fixed seed where it succeeds and check everything after it.

@@ -910,17 +910,21 @@ function tickStandingOrder(
 
 // ---------------------------------------------------------------- resolution
 
-function assignManager(w: WorldState, team: Team, building: Building, actors: Person[]): void {
+function managerCandidates(team: Team, actors: Person[]): Person[] {
   // The lieutenant sends whoever is best with a ledger — but never himself: he
   // is not one of his own crew, and putting him behind a counter would leave
   // them with nobody to take orders from.
   // Assignment already chose the best available hoods. Do not draw again from
   // the whole crew: that can rehire the outgoing manager or steal a hood who
   // is still executing a different order.
-  const pool = actors.filter(
+  return actors.filter(
     (p): p is Person =>
       !!p && p.status === 'active' && p.buildingId == null && p.id !== team.lieutenantId,
   );
+}
+
+function assignManager(w: WorldState, team: Team, building: Building, actors: Person[]): void {
+  const pool = managerCandidates(team, actors);
   if (!pool.length) return;
   pool.sort(
     (a, b) => b.skills.business + b.skills.organization - (a.skills.business + a.skills.organization),
@@ -1072,6 +1076,8 @@ function resolveTarget(
       if (!building || building.ownerGangId !== gang.id)
         return finishOrder(w, order, 'That is not one of your sites.');
       if (building.fbiClosedWeek != null) return finishOrder(w,order,'The business was closed by the FBI.');
+      if (!managerCandidates(team, actors).length)
+        return finishOrder(w, order, `No hood was free to run ${placeName(w, building)}.`);
       if (building.managerId != null) {
         const old = w.people[building.managerId];
         if (old) {
