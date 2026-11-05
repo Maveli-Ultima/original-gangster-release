@@ -349,7 +349,7 @@ export const ORDERS: Record<OrderType, OrderDef> = {
     maxManpower: 10,
     group: 'minor',
     name: 'Intimidate',
-    desc: 'Lean on people who go against your wishes — refusers, witnesses and jurors.',
+    desc: 'Lean on shop owners who refuse you — those who turned down your protection or stopped paying.',
     minutesPerTarget: 67,
     target: 'area',
     skills: ['intimidation'],

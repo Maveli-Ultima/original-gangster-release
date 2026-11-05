@@ -306,6 +306,8 @@ function validateReferences(w: WorldState, candidate: WorldState): void {
       throw Error('Save has an invalid order duty duration.');
     if (o.reportedCrewSize != null && (!Number.isSafeInteger(o.reportedCrewSize) || o.reportedCrewSize < 1 || o.reportedCrewSize > MAX_TEAM_SIZE))
       throw Error('Save has an invalid order crew count.');
+    if (o.refusals?.some(r => !Number.isSafeInteger(r.line) || r.line < 0 || r.line >= o.results.length || !w.buildings[r.buildingId]))
+      throw Error('Save has an invalid order refusal.');
   }
   for (const o of Object.values(w.orders)) {
     if (!w.teams[o.teamId] || !w.gangs[o.gangId]) throw Error('Save has an order for a missing crew.');

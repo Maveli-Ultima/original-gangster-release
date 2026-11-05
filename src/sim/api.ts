@@ -421,6 +421,7 @@ export function rolloverOrders(w: WorldState): void {
         order.cursor = 0;
         order.completedTargets = 0;
         order.results = [];
+        delete order.refusals;
         order.failReason = null;
         order.assignedIds = [];
         delete order.waitReleased;

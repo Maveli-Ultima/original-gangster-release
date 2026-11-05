@@ -251,7 +251,8 @@ export function isValidAreaTarget(
     case 'adjustProtection':
       return b.protection?.gangId === gangId;
     case 'intimidate':
-      return b.protection?.gangId === gangId && b.protection.refusing;
+      if (b.protection?.gangId === gangId) return b.protection.refusing;
+      return !!b.extortRefusedBy?.includes(gangId) && isValidAreaTarget(_w, gangId, 'extort', b);
     case 'explore':
       return b.cls !== 'empty';
     case 'recruit':
@@ -445,6 +446,7 @@ function assignOrder(w: WorldState, team: Team, order: Order, atWeekStart = fals
   order.cursor = 0;
   order.completedTargets = 0;
   order.results = [];
+  delete order.refusals;
   order.failReason = null;
   delete order.waitReleased;
   delete order.waitResumeState;
@@ -996,6 +998,14 @@ function resolveTarget(
   // the job is not counted done for it.
   let missed: string | null = null;
   const miss = (s: string) => { order.results.push(s); missed = s; };
+  const refused = (s: string, site: Building) => { (order.refusals ??= []).push({ line: order.results.length, buildingId: site.id }); miss(s); };
+  const signUp = (site: Building) => {
+    const base = protectionBase(w, site);
+    site.protection = { gangId: gang.id, weekly: base, base, refusing: false, grievance: 0 };
+    site.knowledge[gang.id] = Math.max(site.knowledge[gang.id] ?? 0, 2);
+    delete site.extortRefusedBy;
+    say(`${placeName(w, site)} now pays $${base.toLocaleString('en-US')} a week.`);
+  };
 
   switch (order.type) {
     // -------------------------------------------------- business
@@ -1114,7 +1124,7 @@ function resolveTarget(
         // 0x4CD730 marks the cell refused (flag 8), which stops this week's
         // fear fade in weeklyProtectionFear.
         building.protection.refusedWeek = w.week;
-        miss(`${w.people[building.ownerPersonId ?? -1]?.name ?? 'The owner'} refused to pay.`);
+        refused(`${w.people[building.ownerPersonId ?? -1]?.name ?? 'The owner'} refused to pay.`, building);
         // The till-short branch (not the outright refusal) is where the original
         // owner squeals: squeal level above 200 files a record, +5 evidence.
         if (!hostile && payer && w.cityLayout?.original) squealIfAbove200(w, gang, payer, building, here, lead.id);
@@ -1345,6 +1355,8 @@ function resolveTarget(
           if (i >= 0 && c.gangId === gang.id) c.witnessIds.splice(i, 1);
         }
         say(`${target.name} has seen sense.`);
+        // An owner who turned down the crew's extortion pays after all.
+        if (building && !building.protection && isValidAreaTarget(w, gang.id, 'intimidate', building)) signUp(building);
       } else {
         // A failed roll only flags the target in 0x4DE030; no attitude change.
         opinionShift(target, gang.id, -16, { hostility: 0, fear: 0 });
@@ -1377,12 +1389,9 @@ function resolveTarget(
         victimId: owner?.id ?? null,
       });
       if (success) {
-        const base = protectionBase(w, building);
-        building.protection = { gangId: gang.id, weekly: base, base, refusing: false, grievance: 0 };
-        building.knowledge[gang.id] = Math.max(building.knowledge[gang.id] ?? 0, 2);
         // Recode reading of the extortion write-back: hostility −16, fear +16.
         if (owner) opinionShift(owner, gang.id, -8, { hostility: -16, fear: 16 });
-        say(`${placeName(w, building)} now pays $${base.toLocaleString('en-US')} a week.`);
+        signUp(building);
       } else {
         if (owner) {
           // A refused extortion writes no attitude in 0x4DD9C0; the original only
@@ -1398,7 +1407,8 @@ function resolveTarget(
             }
           }
         }
-        miss(`${placeName(w, building)} refused your protection.`);
+        if (!building.extortRefusedBy?.includes(gang.id)) (building.extortRefusedBy ??= []).push(gang.id);
+        refused(`${placeName(w, building)} refused your protection.`, building);
       }
       break;
     }

@@ -642,6 +642,14 @@ export function createWorld(options: GameOptions): { world: WorldState; rng: Rng
   // HQ blocks: one per quadrant, biased away from the very centre.
   const quadrantPreds = rng.shuffle([...corners]);
   const surnames = rng.shuffle([...GANG_SURNAMES]);
+  // The player's gang carries the boss's surname, and no rival shares it.
+  const playerSurname = options.playerName.trim().split(/\s+/).pop();
+  if (playerSurname) {
+    const plain = (s: string) => s.toLowerCase().replace(/[^a-z]/g, '');
+    const twin = surnames.findIndex((s, i) => i > 0 && plain(s) === plain(playerSurname));
+    if (twin >= 0) surnames[twin] = surnames[0];
+    surnames[0] = playerSurname;
+  }
   const startingRacketChoices = new Map<ID, Building[]>();
   const previousRacketKnowledge = new Map<ID, number>();
   const seedProtection = (b: Building, gangId: ID) => {

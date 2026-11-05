@@ -23,7 +23,7 @@ import { ConfirmDialog, Empty, Hint, Icon, Kicker, Rivets, SkillList, Stamp, Sta
 /** Roles that have an engraved glyph of their own. */
 const ROLE_ICON = new Set(['police', 'policeChief', 'fbi', 'fbiHead', 'judge', 'da', 'mayor', 'reporter', 'clergy', 'snitch', 'accountant', 'lawyer', 'citizen']);
 import { Portrait } from '../Portrait';
-import { RECRUIT_TABS, isStaffRole, recruitsOnTab, staffHireLabel, type RecruitTabId } from './recruitTabs';
+import { RECRUIT_TABS, STAFF_SKILLS, isStaffRole, recruitsOnTab, staffHireLabel, type RecruitTabId } from './recruitTabs';
 import { handleMapHit } from '../mapClick';
 import { selectableOrderPerson, selectableOrderSite, selectedOrderSites } from '../../app/orderSelection';
 import { resourceDragProps, useResourceDrop } from '../resourceDrag';
@@ -424,7 +424,7 @@ function RecruitsSheet({ teamId }: { teamId: ID | null }) {
                   </span>
                 </div>
                 <div style={{ margin: '5px 0' }}>
-                  <SkillList skills={p.skills} columns={2} />
+                  <SkillList skills={p.skills} columns={2} only={isStaffRole(p.role) ? STAFF_SKILLS : undefined} />
                 </div>
               </div>
             </div>
@@ -514,7 +514,7 @@ function PersonSheet({ person, teamId }: { person: Person; teamId?: ID }) {
         </Hint>
       )}
       <div style={{ margin: '12px 0' }}>
-        <SkillList skills={person.skills} columns={2} />
+        <SkillList skills={person.skills} columns={2} only={isStaffRole(person.role) ? STAFF_SKILLS : undefined} />
       </div>
       {payOpen && <PayRoll person={person} onClose={() => setPayOpen(false)} />}
       <div className="team-buttons">

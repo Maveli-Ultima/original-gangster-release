@@ -2719,6 +2719,17 @@ input[type='range']::-moz-range-thumb {
   border-bottom: 1px dotted var(--dots);
   font-size: 13px;
 }
+.report-refusal {
+  display: block;
+  margin-top: 2px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--red);
+  text-align: left;
+  text-decoration: underline;
+  cursor: pointer;
+}
 .report-item .row > b {
   font-weight: 500;
 }
@@ -3606,6 +3617,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 .team-roster { margin-top: 8px; font-size: 12px; }
 .team-roster summary { cursor: pointer; color: var(--ink-2); }
 .lieutenant-planning .paper-strip { max-height: 112px; overflow-y: auto; margin-top: 8px; padding: 6px 8px; transform: none; }
+.lieutenant-planning .paper-strip.skills-strip { max-height: none; }
 .lieutenant-planning .paper-strip .row-line { padding: 3px 2px; font-size: 13px; }
 .lieutenant-planning .planning-orders { min-height: 0; margin-top: 8px; }
 .planning-orders .lb-head { flex-wrap: wrap; padding: 4px 8px; }

@@ -218,7 +218,7 @@ export function LieutenantsTab() {
               Demote
             </button>
             <button aria-pressed={showSkills} className={`btn${showSkills ? ' on' : ''}`} onClick={() => { setShowSkills(!showSkills); setTeamDetailsOpen(true); }} title="Swap the paper between the team and the lieutenant's skills">
-              {showSkills ? 'Team' : 'Attributes'}
+              {showSkills ? 'Team' : 'Skills'}
             </button>
             <button aria-expanded={payOpen} className={`btn${payOpen ? ' on' : ''}`} onClick={() => setPayOpen(!payOpen)}>
               Pay
@@ -237,11 +237,11 @@ export function LieutenantsTab() {
           </div>
 
           <details className="team-roster" open={teamDetailsOpen} onToggle={e => setTeamDetailsOpen(e.currentTarget.open)}>
-            <summary>{showSkills ? 'Lieutenant attributes' : `Crew · ${members.length+1} people · view ${members.length} hood${members.length===1?'':'s'}`}{members.some(m => m.status !== 'active') && ' · members absent'}</summary>
-          <div className="paper-strip" tabIndex={0} role="region" aria-label={showSkills ? "Lieutenant attributes" : "Team members"}>
+            <summary>{showSkills ? 'Lieutenant skills' : `Crew · ${members.length+1} people · view ${members.length} hood${members.length===1?'':'s'}`}{members.some(m => m.status !== 'active') && ' · members absent'}</summary>
+          <div className={`paper-strip${showSkills ? ' skills-strip' : ''}`} tabIndex={0} role="region" aria-label={showSkills ? "Lieutenant skills" : "Team members"}>
             {showSkills ? (
               <>
-                <Kicker style={{ marginBottom: 6 }}>{lt.name}'s attributes</Kicker>
+                <Kicker style={{ marginBottom: 6 }}>{lt.name}'s skills</Kicker>
                 <SkillList skills={lt.skills} columns={2} />
               </>
             ) : (
@@ -441,6 +441,8 @@ function ReportsPanel({ teamId }: { teamId: ID }) {
   useEffect(() => { useGame.getState().recordTutorialVisit('reportsViewed'); }, [sim, sim.world.week]);
   const notify = useGame((s) => s.notify);
   const centreOnPerson = useGame((s) => s.centreOnPerson);
+  const selectBuilding = useGame((s) => s.selectBuilding);
+  const requestCamera = useGame((s) => s.requestCamera);
   const w = sim.world;
   const gang = sim.playerGang;
 
@@ -468,11 +470,26 @@ function ReportsPanel({ teamId }: { teamId: ID }) {
               <Pill kind={o.state === 'done' ? 'good' : 'bad'}>{o.state}</Pill>
             </div>
             {o.failReason && <div className="muted">{o.failReason}</div>}
-            {o.results.map((r, i) => (
-              <div key={i} className="tiny" style={{ marginTop: 2 }}>
-                · {r}
-              </div>
-            ))}
+            {o.results.map((r, i) => {
+              const site = w.buildings[o.refusals?.find((x) => x.line === i)?.buildingId ?? -1];
+              return site ? (
+                <button
+                  key={i}
+                  className="report-refusal tiny"
+                  title="Show on the map"
+                  onClick={() => {
+                    selectBuilding(site.id);
+                    requestCamera({ x: w.lots[site.lotId].center.x, y: w.lots[site.lotId].center.y });
+                  }}
+                >
+                  · {r}
+                </button>
+              ) : (
+                <div key={i} className="tiny" style={{ marginTop: 2 }}>
+                  · {r}
+                </div>
+              );
+            })}
             {/* A Repeat order is already back on the books for this week. */}
             {w.orders[o.id]?.state === 'queued' ? (
               <div className="muted tiny" style={{ marginTop: 6 }}>Repeats this week.</div>

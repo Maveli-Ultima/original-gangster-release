@@ -12,6 +12,9 @@ export const RECRUIT_TABS: readonly { id: RecruitTabId; label: string; empty: st
 
 export const isStaffRole = (role: string): role is StaffRole => role === 'accountant' || role === 'lawyer';
 
+/** All the game ever asks of an accountant or a lawyer (tax, the FBI, the courts). */
+export const STAFF_SKILLS = ['intelligence'] as const;
+
 /** Anyone who is not a specialist counts as a hood, so no recruit can drop off every tab. */
 export function recruitsOnTab<T extends { role: string }>(recruits: readonly T[], tab: RecruitTabId): T[] {
   return recruits.filter((p) => (isStaffRole(p.role) ? p.role === tab : tab === 'hood'));

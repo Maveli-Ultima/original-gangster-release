@@ -144,10 +144,10 @@ const SKILL_ROWS: [keyof Skills, string][] = [
   ['stealth', 'Stealth'],
 ];
 
-export function SkillList({ skills, columns = 2 }: { skills: Skills; columns?: number }) {
+export function SkillList({ skills, columns = 2, only }: { skills: Skills; columns?: number; only?: readonly (keyof Skills)[] }) {
   return (
     <div className="skills" style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}>
-      {SKILL_ROWS.map(([k, label]) => (
+      {SKILL_ROWS.filter(([k]) => !only || only.includes(k)).map(([k, label]) => (
         <div key={k} className="row between tiny">
           <span className="muted">
             <Icon name={`skills/${k}`} size={13} /> {label}

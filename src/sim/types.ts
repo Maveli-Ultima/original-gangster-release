@@ -385,6 +385,8 @@ export interface Building {
   launderingWeek?: number;
   /** Per-gang knowledge: 0 none, 1 type only, 2 extorted, 3 explored, 4 owned. */
   knowledge: Record<ID, number>;
+  /** Gangs whose extortion the owner turned down; Intimidate can still bring him round. */
+  extortRefusedBy?: ID[];
   /** Ownership named in a published report, without revealing protection or hidden premises. */
   reportedOwners?: Record<ID, ID>;
   guardIds: ID[];
@@ -493,6 +495,8 @@ export interface Order {
   workLeft: number;
   estimatedMinutes: number;
   results: string[];
+  /** The report lines that are an owner's refusal, and the premises each came from. */
+  refusals?: { line: number; buildingId: ID }[];
   failReason: string | null;
   /** Street orders are transient and re-entrant. */
   isStreetOrder: boolean;
